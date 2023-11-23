@@ -26,6 +26,15 @@ def get_balances(exchange, trading_pairs):
     return {token: balances.get(token, 0) for token in tokens}
 
 
+def get_prices(exchange, trading_pairs):
+    tokens = get_tokens_from_trading_pairs(trading_pairs)
+    prices = exchange.fetch_tickers([f"{token}/USDT" for token in tokens if token != "USDT"])
+    return {pair.split(":")[0].replace("/", "-"): ticker["last"] for pair, ticker in prices.items()}
+
+
+
+
+
 def get_trades(exchange, trading_pairs, start_time, end_time):
     trading_pairs = hbot_trading_pairs_to_ccxt_trading_pairs(trading_pairs)
     start_time_ts = exchange.parse8601(start_time)
