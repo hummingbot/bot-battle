@@ -26,6 +26,8 @@ for user, data in USERS_DATA.items():
         print(f"Failed to get exchange for {user}: {e}")
         continue
     balances = get_balances(exchange, data["trading_pairs"])
-    print(f"{user} balances: {balances}")
+    prices = get_prices(exchange, data["trading_pairs"])
+    initial_balance_usdt = sum([balance * prices[f"{token}-USDT"] for token, balance in balances.items() if token != "USDT"]) + balances.get("USDT", 0)
     trades = get_trades(exchange, data["trading_pairs"], COMPETITION_START_DATE, COMPETITION_END_DATE)
-    print(f"{user} trades: {trades}")
+    trades["initial_balance_usdt"] = initial_balance_usdt
+    trades.to_csv(f"data/{user}.csv")
