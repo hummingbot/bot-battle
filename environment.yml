@@ -1,0 +1,9 @@
+name: bot-battle
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pydantic
+  - pip:
+      - ccxt
+      - pandas
