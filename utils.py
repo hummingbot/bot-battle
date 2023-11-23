@@ -36,7 +36,7 @@ def get_trades(exchange, trading_pairs, start_time, end_time):
         while initial_time < end_time_ts:
             new_trades = exchange.fetch_my_trades(symbol=trading_pair, since=initial_time)
             if len(new_trades):
-                last_trade = new_trades[len(trades) - 1]
+                last_trade = new_trades[-1]
                 initial_time = last_trade['timestamp'] + 1
             else:
                 initial_time += 432000000  # 5 days
