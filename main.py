@@ -20,7 +20,11 @@ USERS_DATA = {
 }
 
 for user, data in USERS_DATA.items():
-    exchange = get_exchange(data["exchange_id"], data["api_key"], data["api_secret"])
+    try:
+        exchange = get_exchange(data["exchange_id"], data["api_key"], data["api_secret"])
+    except Exception as e:
+        print(f"Failed to get exchange for {user}: {e}")
+        continue
     balances = get_balances(exchange, data["trading_pairs"])
     print(f"{user} balances: {balances}")
     trades = get_trades(exchange, data["trading_pairs"], COMPETITION_START_DATE, COMPETITION_END_DATE)
