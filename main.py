@@ -1,8 +1,12 @@
 # The dates are in UTC
-from utils import get_balances, get_exchange, get_trades
+import time
 
-COMPETITION_START_DATE = "2023-11-01T00:00:00"
-COMPETITION_END_DATE = "2023-11-22T00:00:00"
+import pandas as pd
+
+from utils import get_balances, get_exchange, get_trades, get_prices
+
+COMPETITION_START_DATE = "2023-11-24T00:00:00"
+COMPETITION_END_DATE = "2023-11-27T00:00:00"
 
 USERS_DATA = {
     "user1": {
@@ -19,6 +23,8 @@ USERS_DATA = {
     },
 }
 
+user_balances = {}
+query_time = time.time()
 for user, data in USERS_DATA.items():
     try:
         exchange = get_exchange(data["exchange_id"], data["api_key"], data["api_secret"])
@@ -28,6 +34,13 @@ for user, data in USERS_DATA.items():
     balances = get_balances(exchange, data["trading_pairs"])
     prices = get_prices(exchange, data["trading_pairs"])
     initial_balance_usdt = sum([balance * prices[f"{token}-USDT"] for token, balance in balances.items() if token != "USDT"]) + balances.get("USDT", 0)
+    user_balances[user] = {
+        "timestamp": query_time,
+        "balances": balances,
+        "prices": prices,
+        "initial_balance_usdt": initial_balance_usdt,
+    }
     trades = get_trades(exchange, data["trading_pairs"], COMPETITION_START_DATE, COMPETITION_END_DATE)
-    trades["initial_balance_usdt"] = initial_balance_usdt
     trades.to_csv(f"data/{user}.csv")
+user_balances_df = pd.DataFrame(user_balances).T
+user_balances_df.to_csv(f"data/user_balances_{query_time}.csv")
